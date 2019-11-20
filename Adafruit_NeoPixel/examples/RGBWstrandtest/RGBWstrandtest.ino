@@ -11,10 +11,10 @@
 #define LED_PIN     6
 
 // How many NeoPixels are attached to the Arduino?
-#define LED_COUNT  60
+#define LED_COUNT  40
 
 // NeoPixel brightness, 0 (min) to 255 (max)
-#define BRIGHTNESS 50
+#define BRIGHTNESS 100
 
 // Declare our NeoPixel strip object:
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRBW + NEO_KHZ800);

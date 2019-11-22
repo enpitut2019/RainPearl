@@ -2,7 +2,7 @@
 #include <avr/power.h>
 
 #define PIN            6
-#define NUMPIXELS      40
+#define NUMPIXELS      32
 
 #define DUTY_INPUT     10
 #define VIB_MOTOR_PIN1 9

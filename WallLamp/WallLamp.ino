@@ -3,41 +3,48 @@
 
 // PIN Settings
   // LED Tape Settings
-  #define LED_PIN           6
+  #define LED_PIN           2
   #define NUMPIXELS         40
   // Human sencing sensor Setting
-  #define PIR_IN            15
+  #define PIR_IN            9
   // Motor Setting
   //#define VIB_MOTOR_PIN1  9
   //#define VIB_MOTOR_PIN2  8
+  #define FREQUENCY_SET_PIN 1
 
 // Constant values
   Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, LED_PIN, NEO_GRB + NEO_KHZ800);
   int frequency     = 60;
   float duty_ratio  = 0.1;
   bool led_state    = true;
+  int freq_analog  = 0;
   
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(9600);
+//  Serial.begin(9600);
   pixels.begin();
-  pinMode(PIR_IN, INPUT_PULLUP);
+  pinMode(PIR_IN, INPUT);
   run_motor();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  if(digitalRead(PIR_IN == HIGH)){
+  
+//  if(digitalRead(PIR_IN) == HIGH){
+    digitalRead(PIR_IN);
+    if(true) {
+//  if(true){
     led_state = false;
     int i = 0;
-    while(i < frequency) {
-      led_flush();
+    float delaytime = convertFreq2Delay(analogRead(FREQUENCY_SET_PIN));
+    while(i < frequency / 2) {
+      led_flush(delaytime);
       i += 1;
     }
-    Serial.println("1");
   }else{
     led_const();
-    Serial.println("0");
+    led_state = true;
+    delay(500);
   }
 }
 
@@ -47,17 +54,22 @@ void run_motor(){
 }
 
 void led_const() {
-  if (led_state){
+  if (!led_state){
     for(int i=0;i <NUMPIXELS; i++){
-      pixels.setPixelColor(i, pixels.Color(150,150,150));
+      pixels.setPixelColor(i, pixels.Color(121,200,179));
     }
     pixels.show();
   }
 }
 
-void led_flush(){
-  float delaytime = 1.0 / frequency * 1000;
-  
+float convertFreq2Delay(int analog){
+  int step_val = min(analog, 100);
+  frequency = step_val;
+  if (step_val <= 0) step_val = 1;
+  return 1.0 / step_val * 1000;
+}
+
+void led_flush(float delaytime){
   for(int i=0;i <NUMPIXELS; i++){
     pixels.setPixelColor(i, pixels.Color(150,150,150)); // Moderately bright green color.
   }

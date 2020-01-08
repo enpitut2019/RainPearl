@@ -1,18 +1,21 @@
-#define LED_OUT 10
-#define PIR_IN 15
+int pirPin = 16;                 // PIR Out pin 
+int pirStat = 0;                   // PIR status
 
 void setup() {
-  // put your setup code here, to run once:
-  pinMode(LED_OUT, OUTPUT);
-  pinMode(PIR_IN, INPUT_PULLUP);
+ pinMode(pirPin, INPUT_PULLUP);     
+ Serial.begin(9600);
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
-  if (digitalRead(PIR_IN) == HIGH){
-    digitalWrite(LED_OUT, HIGH);
-  } else {
-    digitalWrite(LED_OUT, LOW);
+void loop(){
+  while(Serial.available() == 0);
+  while(Serial.available() > 0){
+    Serial.read();
   }
-  delay(10);
-}
+  
+  pirStat = digitalRead(pirPin); 
+  if(pirStat == HIGH) {
+    Serial.println("HIGH");
+  }else{
+    Serial.println("LOW");
+  }
+} 

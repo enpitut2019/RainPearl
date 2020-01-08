@@ -1,72 +1,65 @@
 #include <Adafruit_NeoPixel.h>
-//#include <avr/power.h>
 
 // PIN Settings
   // LED Tape Settings
   #define LED_PIN           2
   #define NUMPIXELS         40
   // Human sencing sensor Setting
-  #define PIR_IN            9
-  // Motor Setting
-  //#define VIB_MOTOR_PIN1  9
-  //#define VIB_MOTOR_PIN2  8
-  #define FREQUENCY_SET_PIN 1
+  #define PIR_IN            16
 
 // Constant values
   Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, LED_PIN, NEO_GRB + NEO_KHZ800);
   int frequency     = 60;
   float duty_ratio  = 0.1;
-  bool led_state    = true;
-  int freq_analog  = 0;
+  int span_time = 5;
+  int wait_time = 3;
   
 void setup() {
   // put your setup code here, to run once:
-//  Serial.begin(9600);
+  Serial.begin(9600);
   pixels.begin();
-  pinMode(PIR_IN, INPUT);
-  run_motor();
+  pinMode(PIR_IN, INPUT_PULLUP);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  
-//  if(digitalRead(PIR_IN) == HIGH){
-    digitalRead(PIR_IN);
-    if(true) {
-//  if(true){
-    led_state = false;
+
+  bool detected = ReadPIR();
+
+  if(detected){
+    Serial.println("on");
     int i = 0;
-    float delaytime = convertFreq2Delay(analogRead(FREQUENCY_SET_PIN));
-    while(i < frequency / 2) {
+    float delaytime = convertFreq2Delay();
+    while(i < frequency * span_time) {
       led_flush(delaytime);
       i += 1;
     }
   }else{
+    Serial.println("off");
     led_const();
-    led_state = true;
-    delay(500);
+    delay(wait_time * 1000);
   }
 }
 
-void run_motor(){
-  //analogWrite( VIB_MOTOR_PIN1, 250 );
-  //analogWrite( VIB_MOTOR_PIN2, 250 );
+bool ReadPIR(){
+  int pirStat = digitalRead(PIR_IN); 
+  
+  if(pirStat == HIGH) {
+    return true;
+  }else{
+    return false;
+  }
 }
 
 void led_const() {
-  if (!led_state){
-    for(int i=0;i <NUMPIXELS; i++){
-      pixels.setPixelColor(i, pixels.Color(121,200,179));
-    }
-    pixels.show();
+  for(int i=0;i <NUMPIXELS; i++){
+    pixels.setPixelColor(i, pixels.Color(121,200,179));
   }
+  pixels.show();
 }
 
-float convertFreq2Delay(int analog){
-  int step_val = min(analog, 100);
-  frequency = step_val;
-  if (step_val <= 0) step_val = 1;
-  return 1.0 / step_val * 1000;
+float convertFreq2Delay(){
+  return 1000.0 / (float)frequency;
 }
 
 void led_flush(float delaytime){
